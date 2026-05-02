@@ -1,4 +1,4 @@
-export const API_BASE = `${import.meta.env.VITE_API_BASE_URL || ''}/api/travels`;
+export const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api/travels`;
 
 export const STOPS = ["Civil Lines","Naini","Jhunsi","Phaphamau","Kareli","Chowk","Bamrauli","Airport","Sangam","Allahabad University","Teliyarganj","Mundera","High Court","Zero Road"];
 

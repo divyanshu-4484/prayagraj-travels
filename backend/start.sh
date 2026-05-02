@@ -10,5 +10,10 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
   set +a
 fi
 
-JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}"
-exec "$JAVA_HOME/bin/java" -jar "$SCRIPT_DIR/target/prayagraj-travels-1.0.0.jar" "$@"
+if [ -n "$JAVA_HOME" ]; then
+  JAVA_BIN="$JAVA_HOME/bin/java"
+else
+  JAVA_BIN="java"
+fi
+
+exec "$JAVA_BIN" -jar "$SCRIPT_DIR/target/prayagraj-travels-1.0.0.jar" "$@"

@@ -8,15 +8,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${FRONTEND_URL:http://localhost:3000}")
-    private String frontendUrl;
+    // Comma-separated list of allowed origins. Set in .env, e.g.:
+    //   ALLOWED_ORIGINS=http://localhost:3000,https://myapp.vercel.app
+    @Value("${ALLOWED_ORIGINS}")
+    private String allowedOrigins;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = allowedOrigins.split(",");
         registry.addMapping("/**")
-                .allowedOrigins(frontendUrl, "https://prayagraj-travels-frontend.vercel.app", "http://localhost:3000", "http://localhost:5173")
+                .allowedOrigins(origins)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowedHeaders("*");
     }
 }

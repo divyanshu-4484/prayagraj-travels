@@ -14,13 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-/**
- * REST Controller — all endpoints under /api/travels
- * CORS: allow all origins (for local dev).
- */
 @RestController
 @RequestMapping("/api/travels")
-@CrossOrigin(origins = "*")
 public class TravelsController {
 
     private static final Logger log = LoggerFactory.getLogger(TravelsController.class);
