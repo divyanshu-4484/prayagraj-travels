@@ -1,23 +1,30 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
-  if (!env.VITE_API_BASE_URL) {
+  // In dev (serve) mode, the proxy requires the backend URL
+  if (command === 'serve' && !env.VITE_API_BASE_URL) {
     throw new Error('VITE_API_BASE_URL is not set. Copy .env.example to .env and fill in the value.')
   }
 
-  return {
+  const config = {
     plugins: [react()],
     server: {
       port: 3000,
-      proxy: {
-        '/api': {
-          target: env.VITE_API_BASE_URL,
-          changeOrigin: true,
-        },
-      },
     },
   }
+
+  // Only add proxy in dev mode
+  if (command === 'serve' && env.VITE_API_BASE_URL) {
+    config.server.proxy = {
+      '/api': {
+        target: env.VITE_API_BASE_URL,
+        changeOrigin: true,
+      },
+    }
+  }
+
+  return config
 })

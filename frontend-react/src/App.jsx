@@ -1,59 +1,70 @@
-import React from 'react'
-import { AppProvider } from './context/AppContext'
-import Nav from './components/Nav'
-import SearchBar from './components/SearchBar'
-import FilterPanel from './components/FilterPanel'
-import BusResults from './components/BusResults'
-import LandingHero from './components/LandingHero'
-import LandingFeatures from './components/LandingFeatures'
-import LandingRoutes from './components/LandingRoutes'
-import MyTickets from './components/MyTickets'
-import SeatModal from './components/SeatModal'
-import TrackingModal from './components/TrackingModal'
-import LoginModal from './components/LoginModal'
-import Toast from './components/Toast'
-import { useApp } from './context/AppContext'
+import { lazy, Suspense } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Navbar from './components/layout/Navbar'
+import Footer from './components/layout/Footer'
+import Spinner from './components/ui/Spinner'
+import { useAuth } from './context/AuthContext'
 
-function AppInner() {
-  const { view, showResults } = useApp()
-  return (
-    <>
-      <Nav />
-      {view === 'home' && (
-        <div id="homeSection">
-          {!showResults && <LandingHero />}
-          <SearchBar />
-          {showResults ? (
-            <div className="main" id="mainResults">
-              <FilterPanel />
-              <div className="content">
-                <BusResults />
-              </div>
-            </div>
-          ) : (
-            <div id="landingBottom">
-              <LandingFeatures />
-              <LandingRoutes />
-              <footer className="footer">
-                <p>© 2026 Prayagraj Travels. All rights reserved.</p>
-              </footer>
-            </div>
-          )}
-        </div>
-      )}
-      {view === 'tickets' && <MyTickets />}
-      <SeatModal />
-      <TrackingModal />
-      <LoginModal />
-      <Toast />
-    </>
-  )
+const HomePage        = lazy(() => import('./pages/HomePage'))
+const SearchPage      = lazy(() => import('./pages/SearchResultsPage'))
+const BusDetailsPage  = lazy(() => import('./pages/BusDetailsPage'))
+const AboutPage       = lazy(() => import('./pages/AboutPage'))
+const RoutesPage      = lazy(() => import('./pages/RoutesPage'))
+const ContactPage     = lazy(() => import('./pages/ContactPage'))
+const FAQPage         = lazy(() => import('./pages/FAQPage'))
+const OffersPage      = lazy(() => import('./pages/OffersPage'))
+const LoginPage       = lazy(() => import('./pages/auth/LoginPage'))
+const RegisterPage    = lazy(() => import('./pages/auth/RegisterPage'))
+const ForgotPage      = lazy(() => import('./pages/auth/ForgotPasswordPage'))
+const DashboardLayout = lazy(() => import('./pages/dashboard/DashboardLayout'))
+const ProfilePage     = lazy(() => import('./pages/dashboard/ProfilePage'))
+const BookingsPage    = lazy(() => import('./pages/dashboard/BookingsPage'))
+const ActiveTripsPage = lazy(() => import('./pages/dashboard/ActiveTripsPage'))
+const WalletPage      = lazy(() => import('./pages/dashboard/WalletPage'))
+const NotifPage       = lazy(() => import('./pages/dashboard/NotificationsPage'))
+
+function ProtectedRoute({ children }) {
+  const { isLoggedIn } = useAuth()
+  return isLoggedIn ? children : <Navigate to="/login" replace />
 }
+
+const PageLoader = () => (
+  <div className="min-h-[60vh] flex items-center justify-center">
+    <Spinner size="lg" />
+  </div>
+)
 
 export default function App() {
   return (
-    <AppProvider>
-      <AppInner />
-    </AppProvider>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/bus/:id" element={<BusDetailsPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+            <Route path="/offers" element={<OffersPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPage />} />
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+              <Route index element={<Navigate to="profile" replace />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="bookings" element={<BookingsPage />} />
+              <Route path="active" element={<ActiveTripsPage />} />
+              <Route path="wallet" element={<WalletPage />} />
+              <Route path="notifications" element={<NotifPage />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </main>
+      <Footer />
+    </div>
   )
 }
