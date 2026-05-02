@@ -70,16 +70,20 @@ public class TravelsService {
         // DB-confirmed bookings
         List<String> bookedSeats = repo.findBookedSeats(busId, travelDate);
 
-        // Redis-held seats
-        String pattern = redisHoldKey(busId, "*", travelDate);
-        Set<String> heldKeys = redis.keys(pattern);
+        // Redis-held seats (degrade gracefully if Redis is unavailable)
         Set<String> heldSeats = new HashSet<>();
-        if (heldKeys != null) {
-            for (String key : heldKeys) {
-                // key format: seat:hold:{busId}:{seatNumber}:{date}
-                String[] parts = key.split(":");
-                if (parts.length >= 5) heldSeats.add(parts[3]);
+        try {
+            String pattern = redisHoldKey(busId, "*", travelDate);
+            Set<String> heldKeys = redis.keys(pattern);
+            if (heldKeys != null) {
+                for (String key : heldKeys) {
+                    // key format: seat:hold:{busId}:{seatNumber}:{date}
+                    String[] parts = key.split(":");
+                    if (parts.length >= 5) heldSeats.add(parts[3]);
+                }
             }
+        } catch (Exception e) {
+            log.warn("Redis unavailable for seat hold lookup, continuing without held seats: {}", e.getMessage());
         }
 
         // Build seat list
