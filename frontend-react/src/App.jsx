@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import Spinner from './components/ui/Spinner'
+import ScrollToTop from './components/ScrollToTop'
 import { useAuth } from './context/AuthContext'
 
 const HomePage        = lazy(() => import('./pages/HomePage'))
@@ -37,6 +38,7 @@ const PageLoader = () => (
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       <Navbar />
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
