@@ -27,11 +27,16 @@ export default function BookingsPage() {
   }, [user])
 
   const handleCancel = async (bk) => {
-    if (!window.confirm(`Cancel booking #${bk.id}? Refund will be processed within 3-5 business days.`)) return
-    setCancelling(bk.id)
+    const id = bk?.bookingId
+    if (!id) {
+    toast.error('Invalid booking ID')
+    return
+  }
+    if (!window.confirm(`Cancel booking #${id}? Refund will be processed within 3-5 business days.`)) return
+    setCancelling(id)
     try {
-      await bookingService.cancel(bk.id, user.id)
-      setBookings(prev => prev.map(b => b.id === bk.id ? { ...b, status: 'CANCELLED' } : b))
+      await bookingService.cancel(id, user.id)
+      setBookings(prev => prev.map(b => b?.bookingId === id ? { ...b, status: 'CANCELLED' } : b))
       toast.success('Booking cancelled. Refund initiated.')
     } catch (e) {
       toast.error(e.message || 'Cancellation failed')
@@ -39,9 +44,10 @@ export default function BookingsPage() {
   }
 
   const filtered = bookings.filter(b => {
+    const id = b?.bookingId
     const matchFilter = filter === 'all' || b.status?.toLowerCase() === filter
     const matchSearch = !search || b.passenger_name?.toLowerCase().includes(search.toLowerCase()) ||
-      String(b.bus_id).includes(search) || String(b.id).includes(search)
+      String(b.bus_id).includes(search) || String(id).includes(search)
     return matchFilter && matchSearch
   })
 
@@ -89,13 +95,15 @@ export default function BookingsPage() {
           action={<Link to="/"><Button variant="primary">Search Buses</Button></Link>} />
       ) : (
         <div className="space-y-3">
-          {filtered.map(bk => (
-            <div key={bk.id} className="bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden">
+          {filtered.map(bk => {
+            const bkId = bk?.bookingId
+            return (
+            <div key={bkId} className="bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden">
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-extrabold text-slate-900 text-sm">Booking #{bk.id}</span>
+                      <span className="font-extrabold text-slate-900 text-sm">Booking #{bkId}</span>
                       <Badge variant={statusVariant[bk.status] || 'default'}>{bk.status}</Badge>
                     </div>
                     <p className="text-xs text-slate-500">Bus #{bk.bus_id} • Seat {bk.seat_number}</p>
@@ -126,14 +134,15 @@ export default function BookingsPage() {
                   </button>
                   {bk.status === 'CONFIRMED' && (
                     <Button onClick={() => handleCancel(bk)} variant="danger" size="sm"
-                      loading={cancelling === bk.id}>
+                      loading={cancelling === bkId}>
                       <X className="w-3.5 h-3.5" /> Cancel
                     </Button>
                   )}
                 </div>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
