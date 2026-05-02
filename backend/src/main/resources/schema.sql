@@ -1,19 +1,16 @@
 -- ============================================================
--- Prayagraj Travels – Production Schema
+-- Prayagraj Travels – Idempotent Schema
+-- Safe to run on every startup: CREATE IF NOT EXISTS + INSERT IGNORE
 -- ============================================================
-
-DROP TABLE IF EXISTS bus_live_location;
-DROP TABLE IF EXISTS bookings;
-DROP TABLE IF EXISTS buses;
-DROP TABLE IF EXISTS routes;
 
 CREATE TABLE IF NOT EXISTS buses (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
     source VARCHAR(100),
     destination VARCHAR(100),
     capacity INT,
-    fare DOUBLE
+    fare DOUBLE,
+    UNIQUE KEY uq_bus_name (name)
 );
 
 CREATE TABLE IF NOT EXISTS bookings (
@@ -44,10 +41,10 @@ CREATE TABLE IF NOT EXISTS bus_live_location (
 );
 
 -- ============================================================
--- Seed Data
+-- Seed Data  (INSERT IGNORE skips rows that already exist)
 -- ============================================================
 
-INSERT INTO buses (name, source, destination, capacity, fare) VALUES
+INSERT IGNORE INTO buses (name, source, destination, capacity, fare) VALUES
 -- Civil Lines routes
 ('City Bus 1','Civil Lines','Naini',40,30),
 ('City Bus 2','Civil Lines','Jhunsi',40,25),
@@ -125,7 +122,7 @@ INSERT INTO buses (name, source, destination, capacity, fare) VALUES
 ('City Bus 50','Mundera','Jhunsi',40,28),
 ('City Bus 51','Mundera','Naini',40,30),
 
--- EXTRA RANDOM VARIATIONS (to cross 100)
+-- Extra variations
 ('City Bus 52','Civil Lines','Naini',40,35),
 ('City Bus 53','Civil Lines','Naini',40,28),
 ('City Bus 54','Civil Lines','Naini',40,32),
