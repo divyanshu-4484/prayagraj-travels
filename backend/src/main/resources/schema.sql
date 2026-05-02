@@ -2,6 +2,8 @@
 -- Prayagraj Travels – Idempotent Schema
 -- Safe to run on every startup: CREATE IF NOT EXISTS + INSERT IGNORE
 -- ============================================================
+CREATE DATABASE IF NOT EXISTS railway;
+USE railway;
 
 CREATE TABLE IF NOT EXISTS buses (
     id INT PRIMARY KEY AUTO_INCREMENT,
