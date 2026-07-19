@@ -15,7 +15,7 @@ A full-stack, highly concurrent intra-city bus reservation platform built for Pr
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 🏗️ Architecture & Technology
 
 The project uses a detached client-server architecture, communicating via RESTful JSON APIs.
 
